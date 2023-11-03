@@ -31,24 +31,35 @@ class MainApplication(QMainWindow):
 
         # Etiqueta y ComboBox para el Formato
         formato_label = QLabel("I. Formato:")
+        # Aumentar el tamaño de la letra de la etiqueta
+        formato_label.setStyleSheet("font-size: 16px;")
         self.formato_combo = QComboBox()
         self.formato_combo.addItem("Toma de Inventario")
         self.formato_combo.addItem("Salida por Mantenimiento")
         self.formato_combo.addItem("Cuadro de Asignación")
         self.formato_combo.addItem("Acta de Devolución")
         self.formato_combo.addItem("Desplazamiento")
-
+        self.formato_combo.setStyleSheet("font-size: 16px;")
         layout.addWidget(formato_label, 1, 0)
         layout.addWidget(self.formato_combo, 1, 1)
 
         # Etiqueta y campos de entrada de Datos del Trabajador
         datos_label = QLabel("II. Datos del Origen:")
+        datos_label.setStyleSheet("font-size: 16px;")
         trabajador_label = QLabel("Trabajador:")
+        trabajador_label.setStyleSheet("font-size: 16px;")
         self.trabajador_input = QLineEdit()
         dependencia_label = QLabel("Dependencia:")
+        dependencia_label.setStyleSheet("font-size: 16px;")
         self.dependencia_input = QLineEdit()
         ambiente_label = QLabel("Ambiente:")
+        ambiente_label.setStyleSheet("font-size: 16px;")
         self.ambiente_input = QLineEdit()
+
+        # Aumentar el tamaño de la fuente de los campos de entrada
+        self.trabajador_input.setStyleSheet("font-size: 16px;")
+        self.dependencia_input.setStyleSheet("font-size: 16px;")
+        self.ambiente_input.setStyleSheet("font-size: 16px;")
 
         layout.addWidget(datos_label, 2, 0)
         layout.addWidget(trabajador_label, 3, 0)
@@ -60,6 +71,7 @@ class MainApplication(QMainWindow):
 ###################################################################################################################
         # Crear tabla para Datos de los Bienes
         bienes_label = QLabel("III. Datos de los Bienes:")
+        bienes_label.setStyleSheet("font-size: 16px;")
         layout.addWidget(bienes_label, 4, 0, 1, 6)
         self.table = QTableWidget()
         self.table.setColumnCount(6)
@@ -67,7 +79,8 @@ class MainApplication(QMainWindow):
         layout.addWidget(self.table, 5, 0, 1, 6)
 
 
-        self.table.setStyleSheet("QTableWidget QHeaderView::section { background-color: #0078D7; color: black; } QTableWidget { gridline-color: white; }")
+        self.table.setStyleSheet("QTableWidget QHeaderView::section { background-color: #0078D7; color: black; } QTableWidget { gridline-color: white; font-size: 16px;}")
+        
 
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
@@ -83,19 +96,29 @@ class MainApplication(QMainWindow):
 
         # Establecer estilos
         
-        central_widget.setStyleSheet("background-color: #000000; color: white;")
-        ingresar_button.setStyleSheet("background-color: #0078D7; color: white;")
-        eliminar_button.setStyleSheet("background-color: #FF0000; color: white;")
+        central_widget.setStyleSheet("background-color: #000000; color: white; font-weight: bold; font-size: 16px;")
+        ingresar_button.setStyleSheet("background-color: #0078D7; color: white; font-weight: bold; font-size: 16px;")
+        eliminar_button.setStyleSheet("background-color: #FF0000; color: white; font-weight: bold; font-size: 16px;")
+
+
+
 ############################################################################################################################
         # Agregar sección IV. Datos de Destino
         destino_label = QLabel("IV. Datos de Destino:")
+        destino_label.setStyleSheet("font-size: 16px;")
         layout.addWidget(destino_label, 8, 0, 1, 6)
         trabajador_destino_label = QLabel("Trabajador:")
+        trabajador_destino_label.setStyleSheet("font-size: 16px;")
         self.trabajador_destino_input = QLineEdit()
+        self.trabajador_destino_input.setStyleSheet("font-size: 16px;")
         dependencia_destino_label = QLabel("Dependencia:")
+        dependencia_destino_label.setStyleSheet("font-size: 16px;")
         self.dependencia_destino_input = QLineEdit()
+        self.dependencia_destino_input.setStyleSheet("font-size: 16px;")
         ambiente_destino_label = QLabel("Ambiente:")
+        ambiente_destino_label.setStyleSheet("font-size: 16px;")
         self.ambiente_destino_input = QLineEdit()
+        self.ambiente_destino_input.setStyleSheet("font-size: 16px;")
 
         layout.addWidget(trabajador_destino_label, 9, 0)
         layout.addWidget(self.trabajador_destino_input, 9, 1)
@@ -107,9 +130,14 @@ class MainApplication(QMainWindow):
 
         # Botón "Generar" de color verde
         generar_button = QPushButton("Imprimir")
-        generar_button.setStyleSheet("background-color: #00FF00; color: white;")
+        generar_button.setStyleSheet("background-color: #008000; color: white; font-size: 16px;")
         layout.addWidget(generar_button, 10, 5)
 
+        
+
+        
+
+        
         generar_button.clicked.connect(self.generar_reporte)
 
     def generar_reporte(self):
@@ -206,20 +234,20 @@ class DatosBienesDialog(QDialog):
 
         # Campos de entrada en el modal
         self.codigo_input = QLineEdit()
-        self.descripcion_input = QLineEdit()
-        self.marca_input = QLineEdit()
+        self.equipo_input = QLineEdit()
         self.serie_input = QLineEdit()
+        self.marca_input = QLineEdit()
         self.modelo_input = QLineEdit()
         self.estado_input = QLineEdit()
 
         layout.addWidget(QLabel("Código:"))
         layout.addWidget(self.codigo_input)
-        layout.addWidget(QLabel("Descripción:"))
-        layout.addWidget(self.descripcion_input)
-        layout.addWidget(QLabel("Marca:"))
-        layout.addWidget(self.marca_input)
+        layout.addWidget(QLabel("Equipo:"))
+        layout.addWidget(self.equipo_input)
         layout.addWidget(QLabel("Serie:"))
         layout.addWidget(self.serie_input)
+        layout.addWidget(QLabel("Marca:"))
+        layout.addWidget(self.marca_input)
         layout.addWidget(QLabel("Modelo:"))
         layout.addWidget(self.modelo_input)
         layout.addWidget(QLabel("Estado:"))
@@ -231,12 +259,12 @@ class DatosBienesDialog(QDialog):
 
     def obtener_datos(self):
         codigo = self.codigo_input.text()
-        descripcion = self.descripcion_input.text()
-        marca = self.marca_input.text()
+        equipo = self.equipo_input.text()
         serie = self.serie_input.text()
+        marca = self.marca_input.text()
         modelo = self.modelo_input.text()
         estado = self.estado_input.text()
-        return codigo, descripcion, marca, serie, modelo, estado
+        return codigo, equipo, serie, marca, modelo, estado
 
 def main():
     app = QApplication(sys.argv)
