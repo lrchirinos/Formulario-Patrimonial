@@ -10,7 +10,7 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
 
 import subprocess
-import os
+import os 
 
 class MainApplication(QMainWindow):
     def __init__(self):
