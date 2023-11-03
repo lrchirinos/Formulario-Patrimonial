@@ -8,6 +8,7 @@ from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
+from reportlab.lib.units import cm
 
 import subprocess
 import os 
@@ -18,6 +19,9 @@ class MainApplication(QMainWindow):
 
         self.setWindowTitle("Formulario Unico Patrimonial")
         self.setGeometry(100, 100, 800, 600)
+
+        # # Configura el tamaño y la posición de la ventana
+        # self.setWindowState(Qt.WindowFullScreen)
 
         # Establecer el ícono de la aplicación
         app_icon = QIcon("./image/icon.png")  # Reemplaza con la ruta de tu archivo favicon
@@ -132,11 +136,6 @@ class MainApplication(QMainWindow):
         generar_button = QPushButton("Imprimir")
         generar_button.setStyleSheet("background-color: #008000; color: white; font-size: 16px;")
         layout.addWidget(generar_button, 10, 5)
-
-        
-
-        
-
         
         generar_button.clicked.connect(self.generar_reporte)
 
@@ -177,18 +176,28 @@ class MainApplication(QMainWindow):
                 else:
                     fila.append("")
             datos_tabla.append(fila)
-
+        # Crear un estilo para los campos de la tabla
+        estilo_celda = getSampleStyleSheet()['Normal']
+        estilo_celda.fontSize = 8
         
-        tabla = Table(datos_tabla, colWidths=[1.5 * inch for i in range(6)])
+        
+        tabla = Table(datos_tabla, colWidths=[4 * cm, 2.5 * cm, 2.5 * cm, 2.5 * cm, 2.5 * cm, 1 * cm])
         tabla.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 2),
             ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
             ('GRID', (0, 0), (-1, -1), 1, colors.black)
         ]))
+        
+        
+
+
+        # Aplicar el estilo a las celdas de la tabla
+        for i in range(len(datos_tabla)):
+            tabla.setStyle([('FONTSIZE', (0, i), (-1, i), estilo_celda.fontSize)])
 
         contenido.append(tabla)
 
