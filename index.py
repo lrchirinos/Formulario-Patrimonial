@@ -165,10 +165,14 @@ class MainApplication(QMainWindow):
         contenido.append(Paragraph("Dependencia: <b>{}</b>".format(dependencia_destino), getSampleStyleSheet()['Normal']))
         contenido.append(Paragraph("Ambiente: <b>{}</b>".format(ambiente_destino), getSampleStyleSheet()['Normal']))
 
-        # Crear una tabla para los datos de los bienes
-        datos_tabla = [["CÓDIGO PATRIMONIAL", "EQUIPO", "SERIE", "MARCA", "MODELO", "E"]]
-        for row in range(self.table.rowCount()):
-            fila = []
+        ############### Crear una tabla para los datos de los bienes#################################################
+        datos_tabla = [["ID","CÓDIGO PATRIMONIAL", "EQUIPO", "SERIE", "MARCA", "MODELO", "E"]]
+
+        num_filas = self.table.rowCount()
+        id_autoincremental = 1
+
+        for row in range(num_filas):
+            fila = [str(id_autoincremental)]  # Convertir el ID a cadena y agregarlo a la fila
             for col in range(self.table.columnCount()):
                 item = self.table.item(row, col)
                 if item is not None:
@@ -176,12 +180,13 @@ class MainApplication(QMainWindow):
                 else:
                     fila.append("")
             datos_tabla.append(fila)
+            id_autoincremental += 1
         # Crear un estilo para los campos de la tabla
         estilo_celda = getSampleStyleSheet()['Normal']
         estilo_celda.fontSize = 8
         
         
-        tabla = Table(datos_tabla, colWidths=[4 * cm, 2.5 * cm, 2.5 * cm, 2.5 * cm, 2.5 * cm, 1 * cm])
+        tabla = Table(datos_tabla, colWidths=[1 * cm, 4 * cm, 2.5 * cm, 2.5 * cm, 2.5 * cm, 2.5 * cm, 1 * cm])
         tabla.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
@@ -191,17 +196,13 @@ class MainApplication(QMainWindow):
             ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
             ('GRID', (0, 0), (-1, -1), 1, colors.black)
         ]))
-        
-        
-
-
         # Aplicar el estilo a las celdas de la tabla
         for i in range(len(datos_tabla)):
             tabla.setStyle([('FONTSIZE', (0, i), (-1, i), estilo_celda.fontSize)])
 
         contenido.append(tabla)
 
-        # Construir el PDF
+        ################## Construir el PDF################################
         doc.build(contenido)
 
         pdf_file = os.path.abspath("reporte.pdf")
