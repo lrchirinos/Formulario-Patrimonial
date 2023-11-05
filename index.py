@@ -142,7 +142,7 @@ class MainApplication(QMainWindow):
     def generar_reporte(self):
         print("Generando reporte...")
         # Crear un archivo PDF
-        doc = SimpleDocTemplate("reporte.pdf", pagesize=letter)
+        doc = SimpleDocTemplate("./reporte/reporte.pdf", pagesize=letter)
         contenido = []
 
         # Obtener todos los datos ingresados
@@ -205,7 +205,7 @@ class MainApplication(QMainWindow):
         ################## Construir el PDF################################
         doc.build(contenido)
 
-        pdf_file = os.path.abspath("reporte.pdf")
+        pdf_file = os.path.abspath("./reporte/reporte.pdf")
 
         # Verificar si el archivo PDF existe
         if os.path.exists(pdf_file):
