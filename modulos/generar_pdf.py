@@ -31,7 +31,11 @@ def generar_reporte(formato,trabajador,dependencia,ambiente,trabajador_destino, 
         negrita_center.alignment = 1
         negrita_center.wordWrap = -2 
 
-        
+        estilo_firma = ParagraphStyle('firma')
+        estilo_firma.leading = 12
+        estilo_firma.fontSize = 7
+        estilo_firma.alignment = 1
+        estilo_firma.wordWrap = -2 
 #######################################################################################################################
         # Agregar datos al contenido del PDF
         formato_texto = "I. FORMATO (Marca con un (x) aspa el formulario que va a emplear)<br/><b>{}</b>".format(formato)
@@ -143,7 +147,23 @@ def generar_reporte(formato,trabajador,dependencia,ambiente,trabajador_destino, 
         firma_paragraph = Paragraph(firma_texto, estilo_negrita)
         contenido.append(firma_paragraph)
 
+        datos_firma=[
+            ["", "", "", ""],
+            [Paragraph("FIRMA DEL TRABAJADOR",estilo_firma), Paragraph("VB DEL JEFE DE LA DEPENDENCIA",estilo_firma),Paragraph("FIRMA DEL TRABAJADOR",estilo_firma), Paragraph("VB DEL AREA DE PATRIMONIO",estilo_firma)]
+        ]
+        firma_tabla = Table(datos_firma, colWidths=[5.25 * cm, 4 * cm, 5.25 * cm, 4 * cm])
+        
+        # Aplicar un estilo a la tabla
+        firma_tabla.setStyle(TableStyle([
+            #('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 50),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black)
+        ]))
+        # # Aplicar el estilo a las celdas de la tabla
+        # for i in range(len(datos_firma)):
+        #     firma_tabla.setStyle([('FONTSIZE', (0, i), (-1, i), estilo_contenido.fontSize)])
 
+        contenido.append(firma_tabla)
         ################## Construir el PDF################################
         doc.build(contenido)
 
