@@ -14,13 +14,15 @@ def generar_reporte(formato,trabajador,dependencia,ambiente,trabajador_destino, 
         estilo_contenido = getSampleStyleSheet()['Normal']
         estilo_contenido.fontSize = 8
 
-        doc = SimpleDocTemplate("./reporte/reporte.pdf", pagesize=letter, leftMargin=30)
+        doc = SimpleDocTemplate("./reporte/reporte.pdf", pagesize=letter, leftMargin=30, rightMargin=30)
         contenido = []
         ##########################ESTILOS############################################################
         # Definir un estilo personalizado con negrita
         estilo_negrita = ParagraphStyle('negrita')
         estilo_negrita.fontName = 'Helvetica-Bold'
         estilo_negrita.leading = 12
+        estilo_negrita.fontSize = 9
+        estilo_negrita.leftIndent = 8
 
         negrita_center = ParagraphStyle('negrita')
         negrita_center.fontName = 'Helvetica-Bold'
@@ -136,6 +138,11 @@ def generar_reporte(formato,trabajador,dependencia,ambiente,trabajador_destino, 
         contenido.append(Spacer(1, 12))
 
 #############################################################################################
+##FIRMA DE CONFORMIDAD
+        firma_texto = "V. FIRMA DE CONFORMIDAD<b/>"
+        firma_paragraph = Paragraph(firma_texto, estilo_negrita)
+        contenido.append(firma_paragraph)
+
 
         ################## Construir el PDF################################
         doc.build(contenido)
