@@ -1,7 +1,7 @@
 from reportlab.lib.pagesizes import letter
-from reportlab.lib import colors
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib import colors, styles
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle, Spacer
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.lib.units import cm
 
@@ -11,21 +11,49 @@ import os
 def generar_reporte(formato,trabajador,dependencia,ambiente,trabajador_destino, dependencia_destino, ambiente_destino, tabla):
         print("Generando reporte...")
         # Crear un archivo PDF
-        doc = SimpleDocTemplate("./reporte/reporte.pdf", pagesize=letter)
+        doc = SimpleDocTemplate("./reporte/reporte.pdf", pagesize=letter, leftMargin=30)
         contenido = []
-
+        ##########################ESTILOS############################################################
+        # Definir un estilo personalizado con negrita
+        estilo_negrita = ParagraphStyle('negrita')
+        estilo_negrita.fontName = 'Helvetica-Bold'
+        estilo_negrita.leading = 12
+        estilo_contenido = getSampleStyleSheet()['Normal']
+        estilo_contenido.fontSize = 8
+#######################################################################################################################
         # Agregar datos al contenido del PDF
-        contenido.append(Paragraph("I. Formato: <b>{}</b>".format(formato), getSampleStyleSheet()['Normal']))
-        contenido.append(Paragraph("II. Datos del Origen:", getSampleStyleSheet()['Heading2']))
-        contenido.append(Paragraph("Trabajador: <b>{}</b>".format(trabajador), getSampleStyleSheet()['Normal']))
-        contenido.append(Paragraph("Dependencia: <b>{}</b>".format(dependencia), getSampleStyleSheet()['Normal']))
-        contenido.append(Paragraph("Ambiente: <b>{}</b>".format(ambiente), getSampleStyleSheet()['Normal']))
-        contenido.append(Paragraph("IV. Datos de Destino:", getSampleStyleSheet()['Heading2']))
-        contenido.append(Paragraph("Trabajador: <b>{}</b>".format(trabajador_destino), getSampleStyleSheet()['Normal']))
-        contenido.append(Paragraph("Dependencia: <b>{}</b>".format(dependencia_destino), getSampleStyleSheet()['Normal']))
-        contenido.append(Paragraph("Ambiente: <b>{}</b>".format(ambiente_destino), getSampleStyleSheet()['Normal']))
+        formato_texto = "I. FORMATO (Marca con un (x) aspa el formulario que va a emplear)<br/><b>{}</b>".format(formato)
+        formato_paragraph = Paragraph(formato_texto, estilo_negrita)
+        contenido.append(formato_paragraph)
 
-        ############### Crear una tabla para los datos de los bienes#################################################
+        # Espacio en blanco
+        contenido.append(Spacer(1, 12))
+
+#####################################################################################################
+        origen_texto = "II. DATOS DEL ORIGEN / <b>{}</b><b/>".format(formato)
+        origen_paragraph = Paragraph(origen_texto, estilo_negrita)
+        contenido.append(origen_paragraph)
+        
+        # Tabla para Datos del origen
+        datos_origen = [["Dependencia", "{}".format(dependencia), "CÓDIGO (*)", ""],
+                        ["Detalles del Área", "{}".format(ambiente), "CÓDIGO (**)",""],
+                        ["Trabajador", "{}".format(trabajador), "CÓDIGO (***)", ""]]
+        
+        origen_tabla = Table(datos_origen, colWidths=[3 * cm, 9 * cm, 3 * cm, 3 * cm])
+        
+        # Aplicar un estilo a la tabla
+        origen_tabla.setStyle(TableStyle([
+            #('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black)
+        ]))
+
+        contenido.append(origen_tabla)
+        
+        # Espacio en blanco
+        contenido.append(Spacer(1, 12))
+
+        #############################################################################################
+        #datos_tabla son los datos que obtendra de la "tabla" creada en el index
         datos_tabla = [["ID","CÓDIGO PATRIMONIAL", "EQUIPO", "SERIE", "MARCA", "MODELO", "E"]]
 
         num_filas = tabla.rowCount()
@@ -45,7 +73,7 @@ def generar_reporte(formato,trabajador,dependencia,ambiente,trabajador_destino, 
         estilo_celda = getSampleStyleSheet()['Normal']
         estilo_celda.fontSize = 8
         
-        #creamos la tabla donde ingresaremos los datos de la tabla traida desde index
+        #creamos "Newtabla" la tabla donde ingresaremos los datos de la tabla
         Newtabla = Table(datos_tabla, colWidths=[1 * cm, 4 * cm, 2.5 * cm, 2.5 * cm, 2.5 * cm, 2.5 * cm, 1 * cm])
         Newtabla.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
@@ -61,6 +89,8 @@ def generar_reporte(formato,trabajador,dependencia,ambiente,trabajador_destino, 
             Newtabla.setStyle([('FONTSIZE', (0, i), (-1, i), estilo_celda.fontSize)])
 
         contenido.append(Newtabla)
+
+
 
         ################## Construir el PDF################################
         doc.build(contenido)
