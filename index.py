@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QLabel, QComboBo
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 
-from modulos.generar_pdf import generar_reporte
+from modulos.generar_pdf import GenerarPDF
 
 
 class MainApplication(QMainWindow):
@@ -144,8 +144,11 @@ class MainApplication(QMainWindow):
         
         # Obtener la tabla
         tabla = self.table
+        generador = GenerarPDF()
         # Llamar a la función generar_reporte en el módulo generar_pdf
-        generar_reporte(formato,trabajador,dependencia,ambiente,trabajador_destino, dependencia_destino, ambiente_destino, tabla)
+        # Configurar los datos en GenerarPDF
+        generador.set_datos(formato, trabajador, dependencia, ambiente, trabajador_destino, dependencia_destino, ambiente_destino,tabla)
+        generador.generar_reporte()
 
 
     def mostrar_modal(self):
