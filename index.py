@@ -37,6 +37,9 @@ class MainApplication(QMainWindow):
         self.formato_combo.addItem("Acta de Devolución")
         self.formato_combo.addItem("Desplazamiento")
         self.formato_combo.setStyleSheet("font-size: 16px;")
+                # Ajustar el ancho del combobox a 100 píxeles
+        self.formato_combo.setFixedWidth(100)
+
         layout.addWidget(formato_label, 1, 0)
         layout.addWidget(self.formato_combo, 1, 1)
 
@@ -46,6 +49,9 @@ class MainApplication(QMainWindow):
         trabajador_label = QLabel("Trabajador:")
         trabajador_label.setStyleSheet("font-size: 16px;")
         self.trabajador_input = QLineEdit()
+        codigo_label = QLabel("Código:")
+        codigo_label.setStyleSheet("font-size: 16px;")
+        self.codigo_input = QLineEdit()
         dependencia_label = QLabel("Dependencia:")
         dependencia_label.setStyleSheet("font-size: 16px;")
         self.dependencia_input = QLineEdit()
@@ -57,10 +63,13 @@ class MainApplication(QMainWindow):
         self.trabajador_input.setStyleSheet("font-size: 16px;")
         self.dependencia_input.setStyleSheet("font-size: 16px;")
         self.ambiente_input.setStyleSheet("font-size: 16px;")
+        self.codigo_input.setStyleSheet("font-size: 16px;")
 
         layout.addWidget(datos_label, 2, 0)
         layout.addWidget(trabajador_label, 3, 0)
         layout.addWidget(self.trabajador_input, 3, 1)
+        layout.addWidget(codigo_label, 4, 0)
+        layout.addWidget(self.codigo_input, 4, 1)
         layout.addWidget(dependencia_label, 3, 2)
         layout.addWidget(self.dependencia_input, 3, 3)
         layout.addWidget(ambiente_label, 3, 4)
@@ -69,11 +78,11 @@ class MainApplication(QMainWindow):
         # Crear tabla para Datos de los Bienes
         bienes_label = QLabel("III. Datos de los Bienes:")
         bienes_label.setStyleSheet("font-size: 16px;")
-        layout.addWidget(bienes_label, 4, 0, 1, 6)
+        layout.addWidget(bienes_label, 5, 0, 1, 6)
         self.table = QTableWidget()
         self.table.setColumnCount(6)
         self.table.setHorizontalHeaderLabels(["Código", "Equipo", "Serie", "Marca", "Modelo", "Estado"])
-        layout.addWidget(self.table, 5, 0, 1, 6)
+        layout.addWidget(self.table, 6, 0, 1, 6)
 
 
         self.table.setStyleSheet("QTableWidget QHeaderView::section { background-color: #0078D7; color: black; } QTableWidget { gridline-color: white; font-size: 16px;}")
@@ -84,8 +93,8 @@ class MainApplication(QMainWindow):
         # Botones para Ingresar y Eliminar
         ingresar_button = QPushButton("Ingresar")
         eliminar_button = QPushButton("Eliminar")
-        layout.addWidget(ingresar_button, 6, 5)
-        layout.addWidget(eliminar_button, 7, 5)
+        layout.addWidget(ingresar_button, 7, 5)
+        layout.addWidget(eliminar_button, 8, 5)
 
         # Conectar botones a funciones
         ingresar_button.clicked.connect(self.mostrar_modal)
@@ -103,11 +112,15 @@ class MainApplication(QMainWindow):
         # Agregar sección IV. Datos de Destino
         destino_label = QLabel("IV. Datos de Destino:")
         destino_label.setStyleSheet("font-size: 16px;")
-        layout.addWidget(destino_label, 8, 0, 1, 6)
+        layout.addWidget(destino_label, 9, 0, 1, 6)
         trabajador_destino_label = QLabel("Trabajador:")
         trabajador_destino_label.setStyleSheet("font-size: 16px;")
         self.trabajador_destino_input = QLineEdit()
         self.trabajador_destino_input.setStyleSheet("font-size: 16px;")
+        codigo_destino_label = QLabel("Codigo:")
+        codigo_destino_label.setStyleSheet("font-size: 16px;")
+        self.codigo_destino_input = QLineEdit()
+        self.codigo_destino_input.setStyleSheet("font-size: 16px;")
         dependencia_destino_label = QLabel("Dependencia:")
         dependencia_destino_label.setStyleSheet("font-size: 16px;")
         self.dependencia_destino_input = QLineEdit()
@@ -117,37 +130,41 @@ class MainApplication(QMainWindow):
         self.ambiente_destino_input = QLineEdit()
         self.ambiente_destino_input.setStyleSheet("font-size: 16px;")
 
-        layout.addWidget(trabajador_destino_label, 9, 0)
-        layout.addWidget(self.trabajador_destino_input, 9, 1)
-        layout.addWidget(dependencia_destino_label, 9, 2)
-        layout.addWidget(self.dependencia_destino_input, 9, 3)
-        layout.addWidget(ambiente_destino_label, 9, 4)
-        layout.addWidget(self.ambiente_destino_input, 9, 5)
+        layout.addWidget(trabajador_destino_label, 10, 0)
+        layout.addWidget(self.trabajador_destino_input, 10, 1)
+        layout.addWidget(codigo_destino_label, 11, 0)
+        layout.addWidget(self.codigo_destino_input, 11, 1)
+        layout.addWidget(dependencia_destino_label, 10, 2)
+        layout.addWidget(self.dependencia_destino_input, 10, 3)
+        layout.addWidget(ambiente_destino_label, 10, 4)
+        layout.addWidget(self.ambiente_destino_input, 10, 5)
 ############################################################################################################
 
         # Botón "Generar" de color verde
         generar_button = QPushButton("Imprimir")
         generar_button.setStyleSheet("background-color: #008000; color: white; font-size: 16px;")
-        layout.addWidget(generar_button, 10, 5)
+        layout.addWidget(generar_button, 11, 5)
            
         generar_button.clicked.connect(self.enviar_al_modulo)
 
     def enviar_al_modulo(self):
         # Obtener todos los datos ingresados
         formato = self.formato_combo.currentText()
-        trabajador = self.trabajador_input.text()
-        dependencia = self.dependencia_input.text()
-        ambiente = self.ambiente_input.text()
-        trabajador_destino = self.trabajador_destino_input.text()
-        dependencia_destino = self.dependencia_destino_input.text()
-        ambiente_destino = self.ambiente_destino_input.text()
+        trabajador = self.trabajador_input.text().upper()
+        codigo=self.codigo_input.text().upper()
+        dependencia = self.dependencia_input.text().upper()
+        ambiente = self.ambiente_input.text().upper()
+        trabajador_destino = self.trabajador_destino_input.text().upper()
+        codigo_destino = self.codigo_destino_input.text().upper()
+        dependencia_destino = self.dependencia_destino_input.text().upper()
+        ambiente_destino = self.ambiente_destino_input.text().upper()
         
         # Obtener la tabla
         tabla = self.table
         generador = GenerarPDF()
         # Llamar a la función generar_reporte en el módulo generar_pdf
         # Configurar los datos en GenerarPDF
-        generador.set_datos(formato, trabajador, dependencia, ambiente, trabajador_destino, dependencia_destino, ambiente_destino,tabla)
+        generador.set_datos(formato, trabajador, codigo, dependencia, ambiente, trabajador_destino, codigo_destino, dependencia_destino, ambiente_destino,tabla)
         generador.generar_reporte()
 
 
@@ -204,12 +221,12 @@ class DatosBienesDialog(QDialog):
         layout.addWidget(aceptar_button)
 
     def obtener_datos(self):
-        codigo = self.codigo_input.text()
-        equipo = self.equipo_input.text()
-        serie = self.serie_input.text()
-        marca = self.marca_input.text()
-        modelo = self.modelo_input.text()
-        estado = self.estado_input.text()
+        codigo = self.codigo_input.text().upper()
+        equipo = self.equipo_input.text().upper()
+        serie = self.serie_input.text().upper()
+        marca = self.marca_input.text().upper()
+        modelo = self.modelo_input.text().upper()
+        estado = self.estado_input.text().upper()
         return codigo, equipo, serie, marca, modelo, estado
 
 def main():

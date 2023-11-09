@@ -18,20 +18,24 @@ class GenerarPDF:
         # Inicializa los atributos de la clase con valores predeterminados
         self.formato = ""
         self.trabajador = ""
+        self.codigo = ""
         self.dependencia = ""
         self.ambiente = ""
         self.trabajador_destino = ""
+        self.codigo_destino = ""
         self.dependencia_destino = ""
         self.ambiente_destino = ""
         self.tabla = None  # Aquí puedes inicializarlo con el valor apropiado
 
-    def set_datos(self, formato, trabajador, dependencia, ambiente, trabajador_destino, dependencia_destino, ambiente_destino, tabla):
+    def set_datos(self, formato, trabajador, codigo, dependencia, ambiente, trabajador_destino, codigo_destino, dependencia_destino, ambiente_destino, tabla):
         # Establece los atributos de la clase con los datos proporcionados
         self.formato = formato
         self.trabajador = trabajador
+        self.codigo = codigo
         self.dependencia = dependencia
         self.ambiente = ambiente
         self.trabajador_destino = trabajador_destino
+        self.codigo_destino = codigo_destino
         self.dependencia_destino = dependencia_destino
         self.ambiente_destino = ambiente_destino
         self.tabla = tabla
@@ -39,9 +43,11 @@ class GenerarPDF:
     def enviar_datos(self):
         formato = self.formato
         trabajador = self.trabajador
+        codigo = self.codigo
         dependencia = self.dependencia
         ambiente = self.ambiente
         trabajador_destino = self.trabajador_destino
+        codigo_destino = self.codigo_destino
         dependencia_destino = self.dependencia_destino
         ambiente_destino = self.ambiente_destino
         tabla = self.tabla
@@ -112,9 +118,11 @@ class GenerarPDF:
     def generar_reporte(self):
             formato = self.formato
             trabajador = self.trabajador
+            codigo = self.codigo
             dependencia = self.dependencia
             ambiente = self.ambiente
             trabajador_destino = self.trabajador_destino
+            codigo_destino = self.codigo_destino
             dependencia_destino = self.dependencia_destino
             ambiente_destino = self.ambiente_destino
             tabla = self.tabla
@@ -172,7 +180,7 @@ class GenerarPDF:
             # Tabla para Datos del origen
             datos_origen = [["Dependencia", Paragraph("{}".format(dependencia), negrita_center), "CÓDIGO (*)", ""],
                             ["Detalles del Área", Paragraph("{}".format(ambiente), negrita_center), "CÓDIGO (**)",""],
-                            ["Trabajador", Paragraph("{}".format(trabajador), negrita_center), "CÓDIGO (***)", ""]]
+                            ["Trabajador", Paragraph("{}".format(trabajador), negrita_center), "CÓDIGO (***)", Paragraph("{}".format(codigo), negrita_center)]]
             
             origen_tabla = Table(datos_origen, colWidths=[2.5 * cm, 12 * cm, 2 * cm, 2 * cm])
             
@@ -196,11 +204,24 @@ class GenerarPDF:
             bienes_texto = "III. DATOS DE LOS BIENES<b/>"
             bienes_paragraph = Paragraph(bienes_texto, estilo_negrita)
             contenido.append(bienes_paragraph)
+
             #datos_tabla son los datos que obtendra de la "tabla" creada en el index
             datos_tabla = [["ID","CÓDIGO PATRIMONIAL", "EQUIPO", "SERIE", "MARCA", "MODELO", "E"]]
 
             num_filas = tabla.rowCount()
             id_autoincremental = 1
+
+            tabla_estilo = ParagraphStyle('tabla')
+            tabla_estilo.leading = 12
+            tabla_estilo.fontSize = 8
+            tabla_estilo.leftIndent = 8
+            #tabla_estilo.leading = 12
+            #tabla_estilo.fontSize = 8
+            #tabla_estilo.alignment = 1
+            # tabla_estilo.wordWrap = -2 
+            # tabla_estilo.topPadding = 0  # Padding superior para centrar verticalmente
+            # tabla_estilo.bottomPadding = 5  # Padding inferior para centrar verticalmente
+
 
             for row in range(num_filas):
                 fila = [str(id_autoincremental)]  # Convertir el ID a cadena y agregarlo a la fila
@@ -215,6 +236,9 @@ class GenerarPDF:
             # Crear un estilo para los campos de la tabla
             estilo_celda = getSampleStyleSheet()['Normal']
             estilo_celda.fontSize = 8
+            # estilo_celda.alignment = 1 
+            # estilo_celda.leading = 8
+            # estilo_celda.wordWrap = -2  # Espaciado entre líneas
             
             #creamos "Newtabla" la tabla donde ingresaremos los datos de la tabla
             Newtabla = Table(datos_tabla, colWidths=[0.5 * cm, 3.5 * cm, 2.5 * cm, 5 * cm, 3 * cm, 3.5 * cm, 0.5 * cm])
@@ -240,7 +264,7 @@ class GenerarPDF:
             # Tabla para Datos del origen
             datos_destino = [["Dependencia", Paragraph("{}".format(dependencia_destino), negrita_center), "CÓDIGO (*)", ""],
                             ["Detalles del Área", Paragraph("{}".format(ambiente_destino), negrita_center), "CÓDIGO (**)",""],
-                            ["Trabajador", Paragraph("{}".format(trabajador_destino), negrita_center), "CÓDIGO (***)", ""]]
+                            ["Trabajador", Paragraph("{}".format(trabajador_destino), negrita_center), "CÓDIGO (***)", Paragraph("{}".format(codigo_destino), negrita_center)]]
             
             destino_tabla = Table(datos_destino, colWidths=[2.5 * cm, 12 * cm, 2 * cm, 2 * cm])
             
