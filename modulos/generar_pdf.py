@@ -17,6 +17,7 @@ class GenerarPDF:
     def __init__(self):
         # Inicializa los atributos de la clase con valores predeterminados
         self.formato = ""
+        self.numero = ""
         self.trabajador = ""
         self.codigo = ""
         self.dependencia = ""
@@ -27,9 +28,10 @@ class GenerarPDF:
         self.ambiente_destino = ""
         self.tabla = None  # Aquí puedes inicializarlo con el valor apropiado
 
-    def set_datos(self, formato, trabajador, codigo, dependencia, ambiente, trabajador_destino, codigo_destino, dependencia_destino, ambiente_destino, tabla):
+    def set_datos(self, formato, numero, trabajador, codigo, dependencia, ambiente, trabajador_destino, codigo_destino, dependencia_destino, ambiente_destino, tabla):
         # Establece los atributos de la clase con los datos proporcionados
         self.formato = formato
+        self.numero = numero
         self.trabajador = trabajador
         self.codigo = codigo
         self.dependencia = dependencia
@@ -51,8 +53,26 @@ class GenerarPDF:
         dependencia_destino = self.dependencia_destino
         ambiente_destino = self.ambiente_destino
         tabla = self.tabla
+        # Obtener el número de filas y columnas en la tabla
+        num_filas = tabla.rowCount()
+        num_columnas = tabla.columnCount()
+
+        # Crear una lista para almacenar los datos de la tabla
+        datos_tabla = []
+
+        # Iterar sobre las filas y columnas para obtener los datos
+        for fila in range(num_filas):
+            fila_datos = []  # Lista para almacenar los datos de la fila actual
+            for columna in range(num_columnas):
+                item = tabla.item(fila, columna)
+                if item is not None:
+                    fila_datos.append(item.text())  # Agregar el texto del elemento a la lista
+                else:
+                    fila_datos.append("")  # Si el elemento es None, agregar una cadena vacía a la lista
+            datos_tabla.append(fila_datos)
         # Agregar el código QR
-        datos = f"formato: {formato} \n Datos de origen: \n  \ttrabajador: {trabajador} \n \tdependencia: {dependencia} \n \tambiente: {ambiente} \n Datos del destino:\n \ttrabajador: {trabajador_destino} \n \tdependencia: {dependencia_destino} \n \tambiente: {ambiente_destino}"
+        #datos = f"formato: {formato} \n Datos de origen: \n  \ttrabajador: {trabajador} \n \tdependencia: {dependencia} \n \tambiente: {ambiente} \n Datos del destino:\n \ttrabajador: {trabajador_destino} \n \tdependencia: {dependencia_destino} \n \tambiente: {ambiente_destino}"
+        datos = f"trabajador origen: {trabajador} \n dependencia origen: {dependencia} \n trabajador destino: {trabajador_destino} \n dependencia destino: {dependencia_destino} \n dispositivos: {datos_tabla}"
         return datos
     def header(self,canvas, doc):
         # Agregar el logo
@@ -103,11 +123,12 @@ class GenerarPDF:
         fecha_paragraph.drawOn(canvas, x_fecha, y_fecha)
 
         # Agregar el texto "Número de Papeleta" en la parte izquierda
+        numero = self.numero
         estilo_numero_papeleta = getSampleStyleSheet()['Normal']
         estilo_numero_papeleta.alignment = 1  # Alinea el texto al centro
         estilo_numero_papeleta.fontName = 'Helvetica-Bold'  # Cambia 'MiFuente' por el nombre de tu fuente personalizada
         estilo_numero_papeleta.fontSize = 8
-        numero_papeleta_texto = "N° de Papeleta \t123456"
+        numero_papeleta_texto = f"N° de Papeleta: \t{numero}"
         x_numero_papeleta = 425 # Ajusta la coordenada X del número de papeleta
         y_numero_papeleta = 690  # Ajusta la coordenada Y del número de papeleta
         numero_papeleta_paragraph = Paragraph(numero_papeleta_texto, estilo_numero_papeleta)
@@ -256,30 +277,31 @@ class GenerarPDF:
 
             contenido.append(Spacer(1, 12))
     #############################################################################################
-    ##DATOS DE DESTINO
-            destino_texto = "IV. DATOS DEL DESTINO (solo utilizar en caso de Desplazamiento / Salida por mantenimiento / Acta de Devolución)<b/>"
-            destino_paragraph = Paragraph(destino_texto, estilo_negrita)
-            contenido.append(destino_paragraph)
-            
-            # Tabla para Datos del origen
-            datos_destino = [["Dependencia", Paragraph("{}".format(dependencia_destino), negrita_center), "CÓDIGO (*)", ""],
-                            ["Detalles del Área", Paragraph("{}".format(ambiente_destino), negrita_center), "CÓDIGO (**)",""],
-                            ["Trabajador", Paragraph("{}".format(trabajador_destino), negrita_center), "CÓDIGO (***)", Paragraph("{}".format(codigo_destino), negrita_center)]]
-            
-            destino_tabla = Table(datos_destino, colWidths=[2.5 * cm, 12 * cm, 2 * cm, 2 * cm])
-            
-            # Aplicar un estilo a la tabla
-            destino_tabla.setStyle(TableStyle([
-                #('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
-                ('GRID', (0, 0), (-1, -1), 1, colors.black)
-            ]))
 
-            # Aplicar el estilo a las celdas de la tabla
-            for i in range(len(datos_destino)):
-                destino_tabla.setStyle([('FONTSIZE', (0, i), (-1, i), estilo_contenido.fontSize)])
+    # Sección de Datos de Destino
+            if formato in ["Desplazamiento", "Salida por Mantenimiento", "Acta de Devolución"]:
+                destino_texto = "IV. DATOS DEL DESTINO (solo utilizar en caso de Desplazamiento / Salida por mantenimiento / Acta de Devolución)<b/>"
+                destino_paragraph = Paragraph(destino_texto, estilo_negrita)
+                contenido.append(destino_paragraph)
 
-            contenido.append(destino_tabla)
+                # Tabla para Datos del origen
+                datos_destino = [["Dependencia", Paragraph("{}".format(dependencia_destino), negrita_center), "CÓDIGO (*)", ""],
+                                ["Detalles del Área", Paragraph("{}".format(ambiente_destino), negrita_center), "CÓDIGO (**)",""],
+                                ["Trabajador", Paragraph("{}".format(trabajador_destino), negrita_center), "CÓDIGO (***)", Paragraph("{}".format(codigo_destino), negrita_center)]]
+
+                destino_tabla = Table(datos_destino, colWidths=[2.5 * cm, 12 * cm, 2 * cm, 2 * cm])
+
+                # Aplicar un estilo a la tabla
+                destino_tabla.setStyle(TableStyle([
+                    ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
+                    ('GRID', (0, 0), (-1, -1), 1, colors.black)
+                ]))
+
+                # Aplicar el estilo a las celdas de la tabla
+                for i in range(len(datos_destino)):
+                    destino_tabla.setStyle([('FONTSIZE', (0, i), (-1, i), estilo_contenido.fontSize)])
+
+                contenido.append(destino_tabla)
             
             # Espacio en blanco
             contenido.append(Spacer(1, 12))

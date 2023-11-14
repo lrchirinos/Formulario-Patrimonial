@@ -1,7 +1,8 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QLabel, QComboBox, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem, QGridLayout, QVBoxLayout, QDialog, QHeaderView, QSpacerItem, QSizePolicy,QHBoxLayout
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QPixmap
+
 
 from modulos.generar_pdf import GenerarPDF
 
@@ -38,10 +39,16 @@ class MainApplication(QMainWindow):
         self.formato_combo.addItem("Desplazamiento")
         self.formato_combo.setStyleSheet("font-size: 16px;")
                 # Ajustar el ancho del combobox a 100 píxeles
-        self.formato_combo.setFixedWidth(100)
-
+        #self.formato_combo.setFixedWidth(200)
+        
         layout.addWidget(formato_label, 1, 0)
         layout.addWidget(self.formato_combo, 1, 1)
+
+        numero_label = QLabel("N° Papeleta:")
+        numero_label.setStyleSheet("font-size: 16px;")
+        self.numero_input = QLineEdit()
+        layout.addWidget(numero_label, 1, 2)
+        layout.addWidget(self.numero_input, 1, 3)
 
         # Etiqueta y campos de entrada de Datos del Trabajador
         datos_label = QLabel("II. Datos del Origen:")
@@ -110,33 +117,47 @@ class MainApplication(QMainWindow):
 
 ############################################################################################################################
         # Agregar sección IV. Datos de Destino
-        destino_label = QLabel("IV. Datos de Destino:")
+        destino_label = QLabel("IV. Datos de Destino:\t")
         destino_label.setStyleSheet("font-size: 16px;")
+        info_label = QLabel("(solo utilizar en caso de Desplazamiento / Salida por mantenimiento / Acta de Devolución)")
+        info_label.setStyleSheet("font-size: 10px;")
+        # ayuda_icono = QLabel()
+        # pixmap = QPixmap("./image/question.png").scaled(20, 20, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        # ayuda_icono.setPixmap(pixmap)
+        # ayuda_icono.setCursor(Qt.WhatsThisCursor)
+        # ayuda_icono.setToolTip("Haz clic aquí para obtener ayuda sobre Datos de Destino")
+        # ayuda_icono.mousePressEvent = self.mostrar_ayuda
+        # ayuda_icono.setMouseTracking(True)
         layout.addWidget(destino_label, 9, 0, 1, 6)
-        trabajador_destino_label = QLabel("Trabajador:")
-        trabajador_destino_label.setStyleSheet("font-size: 16px;")
+        layout.addWidget(info_label, 9, 1, 1, 6)
+        
+        #layout.addWidget(ayuda_icono, 9, 1)
+        # Agregar un ícono de ayuda
+        
+        self.trabajador_destino_label = QLabel("Trabajador:")
+        self.trabajador_destino_label.setStyleSheet("font-size: 16px;")
         self.trabajador_destino_input = QLineEdit()
         self.trabajador_destino_input.setStyleSheet("font-size: 16px;")
-        codigo_destino_label = QLabel("Codigo:")
-        codigo_destino_label.setStyleSheet("font-size: 16px;")
+        self.codigo_destino_label = QLabel("Codigo:")
+        self.codigo_destino_label.setStyleSheet("font-size: 16px;")
         self.codigo_destino_input = QLineEdit()
         self.codigo_destino_input.setStyleSheet("font-size: 16px;")
-        dependencia_destino_label = QLabel("Dependencia:")
-        dependencia_destino_label.setStyleSheet("font-size: 16px;")
+        self.dependencia_destino_label = QLabel("Dependencia:")
+        self.dependencia_destino_label.setStyleSheet("font-size: 16px;")
         self.dependencia_destino_input = QLineEdit()
         self.dependencia_destino_input.setStyleSheet("font-size: 16px;")
-        ambiente_destino_label = QLabel("Ambiente:")
-        ambiente_destino_label.setStyleSheet("font-size: 16px;")
+        self.ambiente_destino_label = QLabel("Ambiente:")
+        self.ambiente_destino_label.setStyleSheet("font-size: 16px;")
         self.ambiente_destino_input = QLineEdit()
         self.ambiente_destino_input.setStyleSheet("font-size: 16px;")
 
-        layout.addWidget(trabajador_destino_label, 10, 0)
+        layout.addWidget(self.trabajador_destino_label, 10, 0)
         layout.addWidget(self.trabajador_destino_input, 10, 1)
-        layout.addWidget(codigo_destino_label, 11, 0)
+        layout.addWidget(self.codigo_destino_label, 11, 0)
         layout.addWidget(self.codigo_destino_input, 11, 1)
-        layout.addWidget(dependencia_destino_label, 10, 2)
+        layout.addWidget(self.dependencia_destino_label, 10, 2)
         layout.addWidget(self.dependencia_destino_input, 10, 3)
-        layout.addWidget(ambiente_destino_label, 10, 4)
+        layout.addWidget(self.ambiente_destino_label, 10, 4)
         layout.addWidget(self.ambiente_destino_input, 10, 5)
 ############################################################################################################
 
@@ -147,9 +168,34 @@ class MainApplication(QMainWindow):
            
         generar_button.clicked.connect(self.enviar_al_modulo)
 
+        # Conectar la señal currentIndexChanged del ComboBox a la función que maneja la visibilidad de los datos de destino
+        self.formato_combo.currentIndexChanged.connect(self.actualizar_visibilidad_destino)
+
+        # Inicialmente, ocultar los elementos relacionados con los datos de destino
+        self.actualizar_visibilidad_destino()
+
+
+    def actualizar_visibilidad_destino(self):
+        # Obtener el formato seleccionado
+        formato_seleccionado = self.formato_combo.currentText()
+
+        # Determinar si mostrar o ocultar los elementos relacionados con los datos de destino
+        mostrar_datos_destino = formato_seleccionado in ["Desplazamiento", "Salida por Mantenimiento", "Acta de Devolución"]
+
+        # Establecer la visibilidad de los elementos relacionados con los datos de destino
+        self.trabajador_destino_label.setVisible(mostrar_datos_destino)
+        self.trabajador_destino_input.setVisible(mostrar_datos_destino)
+        self.codigo_destino_label.setVisible(mostrar_datos_destino)
+        self.codigo_destino_input.setVisible(mostrar_datos_destino)
+        self.dependencia_destino_label.setVisible(mostrar_datos_destino)
+        self.dependencia_destino_input.setVisible(mostrar_datos_destino)
+        self.ambiente_destino_label.setVisible(mostrar_datos_destino)
+        self.ambiente_destino_input.setVisible(mostrar_datos_destino)
+
     def enviar_al_modulo(self):
         # Obtener todos los datos ingresados
         formato = self.formato_combo.currentText()
+        numero = self.numero_input.text()
         trabajador = self.trabajador_input.text().upper()
         codigo=self.codigo_input.text().upper()
         dependencia = self.dependencia_input.text().upper()
@@ -164,7 +210,7 @@ class MainApplication(QMainWindow):
         generador = GenerarPDF()
         # Llamar a la función generar_reporte en el módulo generar_pdf
         # Configurar los datos en GenerarPDF
-        generador.set_datos(formato, trabajador, codigo, dependencia, ambiente, trabajador_destino, codigo_destino, dependencia_destino, ambiente_destino,tabla)
+        generador.set_datos(formato, numero, trabajador, codigo, dependencia, ambiente, trabajador_destino, codigo_destino, dependencia_destino, ambiente_destino,tabla)
         generador.generar_reporte()
 
 
