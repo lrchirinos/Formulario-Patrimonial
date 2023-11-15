@@ -1,8 +1,7 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QLabel, QComboBox, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem, QGridLayout, QVBoxLayout, QDialog, QHeaderView, QSpacerItem, QSizePolicy,QHBoxLayout
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon, QPixmap
-
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QLabel, QComboBox, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem, QGridLayout, QVBoxLayout, QDialog, QHeaderView,QDateEdit
+from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import QDate
 
 from modulos.generar_pdf import GenerarPDF
 
@@ -12,7 +11,7 @@ class MainApplication(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("Formulario Unico Patrimonial")
-        self.setGeometry(100, 100, 800, 600)
+        self.setGeometry(100, 100, 1200, 600)
 
         # # Configura el tamaño y la posición de la ventana
         # self.setWindowState(Qt.WindowFullScreen)
@@ -38,8 +37,6 @@ class MainApplication(QMainWindow):
         self.formato_combo.addItem("Acta de Devolución")
         self.formato_combo.addItem("Desplazamiento")
         self.formato_combo.setStyleSheet("font-size: 16px;")
-                # Ajustar el ancho del combobox a 100 píxeles
-        #self.formato_combo.setFixedWidth(200)
         
         layout.addWidget(formato_label, 1, 0)
         layout.addWidget(self.formato_combo, 1, 1)
@@ -56,14 +53,14 @@ class MainApplication(QMainWindow):
         trabajador_label = QLabel("Trabajador:")
         trabajador_label.setStyleSheet("font-size: 16px;")
         self.trabajador_input = QLineEdit()
-        codigo_label = QLabel("Código:")
-        codigo_label.setStyleSheet("font-size: 16px;")
+        self.codigo_label = QLabel("Código:")
+        self.codigo_label.setStyleSheet("font-size: 16px;")
         self.codigo_input = QLineEdit()
         dependencia_label = QLabel("Dependencia:")
         dependencia_label.setStyleSheet("font-size: 16px;")
         self.dependencia_input = QLineEdit()
-        ambiente_label = QLabel("Ambiente:")
-        ambiente_label.setStyleSheet("font-size: 16px;")
+        self.ambiente_label = QLabel("Ambiente:")
+        self.ambiente_label.setStyleSheet("font-size: 16px;")
         self.ambiente_input = QLineEdit()
 
         # Aumentar el tamaño de la fuente de los campos de entrada
@@ -75,11 +72,11 @@ class MainApplication(QMainWindow):
         layout.addWidget(datos_label, 2, 0)
         layout.addWidget(trabajador_label, 3, 0)
         layout.addWidget(self.trabajador_input, 3, 1)
-        layout.addWidget(codigo_label, 4, 0)
+        layout.addWidget(self.codigo_label, 4, 0)
         layout.addWidget(self.codigo_input, 4, 1)
         layout.addWidget(dependencia_label, 3, 2)
         layout.addWidget(self.dependencia_input, 3, 3)
-        layout.addWidget(ambiente_label, 3, 4)
+        layout.addWidget(self.ambiente_label, 3, 4)
         layout.addWidget(self.ambiente_input, 3, 5)
 ###################################################################################################################
         # Crear tabla para Datos de los Bienes
@@ -100,8 +97,9 @@ class MainApplication(QMainWindow):
         # Botones para Ingresar y Eliminar
         ingresar_button = QPushButton("Ingresar")
         eliminar_button = QPushButton("Eliminar")
-        layout.addWidget(ingresar_button, 7, 5)
-        layout.addWidget(eliminar_button, 8, 5)
+        layout.addWidget(ingresar_button, 7, 2)
+        layout.addWidget(eliminar_button, 7, 3)
+        eliminar_button.setFixedWidth(115)
 
         # Conectar botones a funciones
         ingresar_button.clicked.connect(self.mostrar_modal)
@@ -116,23 +114,12 @@ class MainApplication(QMainWindow):
 
 
 ############################################################################################################################
-        # Agregar sección IV. Datos de Destino
-        destino_label = QLabel("IV. Datos de Destino:\t")
-        destino_label.setStyleSheet("font-size: 16px;")
-        info_label = QLabel("(solo utilizar en caso de Desplazamiento / Salida por mantenimiento / Acta de Devolución)")
-        info_label.setStyleSheet("font-size: 10px;")
-        # ayuda_icono = QLabel()
-        # pixmap = QPixmap("./image/question.png").scaled(20, 20, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        # ayuda_icono.setPixmap(pixmap)
-        # ayuda_icono.setCursor(Qt.WhatsThisCursor)
-        # ayuda_icono.setToolTip("Haz clic aquí para obtener ayuda sobre Datos de Destino")
-        # ayuda_icono.mousePressEvent = self.mostrar_ayuda
-        # ayuda_icono.setMouseTracking(True)
-        layout.addWidget(destino_label, 9, 0, 1, 6)
-        layout.addWidget(info_label, 9, 1, 1, 6)
         
-        #layout.addWidget(ayuda_icono, 9, 1)
-        # Agregar un ícono de ayuda
+        # Agregar sección IV. Datos de Destino
+        self.destino_label = QLabel("IV. Datos de Destino:\t")
+        self.destino_label.setStyleSheet("font-size: 16px;")
+        layout.addWidget(self.destino_label, 9, 0, 1, 6)
+        
         
         self.trabajador_destino_label = QLabel("Trabajador:")
         self.trabajador_destino_label.setStyleSheet("font-size: 16px;")
@@ -159,12 +146,51 @@ class MainApplication(QMainWindow):
         layout.addWidget(self.dependencia_destino_input, 10, 3)
         layout.addWidget(self.ambiente_destino_label, 10, 4)
         layout.addWidget(self.ambiente_destino_input, 10, 5)
+
+        #########en el caso que la salidad sea por mantenimiento####################
+        self.solicitud_label = QLabel("Informe Solicitud: ")
+        self.solicitud_label.setStyleSheet("font-size: 16px;")
+        self.solicitud_input = QLineEdit()
+        self.solicitud_input.setStyleSheet("font-size: 16px;")
+        self.diagnostico_label = QLabel("Informe Diagnóstico: ")
+        self.diagnostico_label.setStyleSheet("font-size: 16px;")
+        self.diagnostico_input = QLineEdit()
+        self.diagnostico_input.setStyleSheet("font-size: 16px;")
+        self.conclusion_label = QLabel("Informe Conclusión: ")
+        self.conclusion_label.setStyleSheet("font-size: 16px;")
+        self.conclusion_input = QLineEdit()
+        self.conclusion_input.setStyleSheet("font-size: 16px;")
+        self.ingreso_label = QLabel("Ingreso: ")
+        self.ingreso_label.setStyleSheet("font-size: 16px;")
+        self.ingreso_input = QDateEdit()
+        self.reparacion_label = QLabel("Reparación: ")
+        self.reparacion_label.setStyleSheet("font-size: 16px;")
+        self.reparacion_input = QDateEdit()
+
+        # Configuración adicional para el QDateEdit
+        self.ingreso_input.setDisplayFormat("dd/MM/yyyy")
+        self.reparacion_input.setDisplayFormat("dd/MM/yyyy")
+        fecha_actual = QDate.currentDate()
+        self.ingreso_input.setDate(fecha_actual)
+        self.reparacion_input.setDate(fecha_actual)
+
+        layout.addWidget(self.solicitud_label, 12, 0)
+        layout.addWidget(self.solicitud_input, 12, 1, 1, 5)
+        layout.addWidget(self.diagnostico_label, 13, 0)
+        layout.addWidget(self.diagnostico_input, 13, 1, 1, 5)
+        layout.addWidget(self.conclusion_label, 14, 0)
+        layout.addWidget(self.conclusion_input, 14, 1, 1, 5)
+        layout.addWidget(self.ingreso_label, 15, 0)
+        layout.addWidget(self.ingreso_input, 15, 1)
+        layout.addWidget(self.reparacion_label, 15, 2)
+        layout.addWidget(self.reparacion_input, 15, 3)
+
 ############################################################################################################
 
         # Botón "Generar" de color verde
         generar_button = QPushButton("Imprimir")
         generar_button.setStyleSheet("background-color: #008000; color: white; font-size: 16px;")
-        layout.addWidget(generar_button, 11, 5)
+        layout.addWidget(generar_button, 16, 5)
            
         generar_button.clicked.connect(self.enviar_al_modulo)
 
@@ -180,9 +206,10 @@ class MainApplication(QMainWindow):
         formato_seleccionado = self.formato_combo.currentText()
 
         # Determinar si mostrar o ocultar los elementos relacionados con los datos de destino
-        mostrar_datos_destino = formato_seleccionado in ["Desplazamiento", "Salida por Mantenimiento", "Acta de Devolución"]
-
+        mostrar_datos_destino = formato_seleccionado in ["Desplazamiento", "Acta de Devolución"]
+        mostar_mantenimiento= formato_seleccionado in ["Salida por Mantenimiento"]
         # Establecer la visibilidad de los elementos relacionados con los datos de destino
+        self.destino_label.setVisible(mostrar_datos_destino)
         self.trabajador_destino_label.setVisible(mostrar_datos_destino)
         self.trabajador_destino_input.setVisible(mostrar_datos_destino)
         self.codigo_destino_label.setVisible(mostrar_datos_destino)
@@ -191,6 +218,21 @@ class MainApplication(QMainWindow):
         self.dependencia_destino_input.setVisible(mostrar_datos_destino)
         self.ambiente_destino_label.setVisible(mostrar_datos_destino)
         self.ambiente_destino_input.setVisible(mostrar_datos_destino)
+        #####para hacer visible cuando es salida por mantenimiento######
+        self.solicitud_label.setVisible(mostar_mantenimiento)
+        self.solicitud_input.setVisible(mostar_mantenimiento)
+        self.diagnostico_label.setVisible(mostar_mantenimiento)
+        self.diagnostico_input.setVisible(mostar_mantenimiento)
+        self.conclusion_label.setVisible(mostar_mantenimiento)
+        self.conclusion_input.setVisible(mostar_mantenimiento)
+        self.ingreso_label.setVisible(mostar_mantenimiento)
+        self.ingreso_input.setVisible(mostar_mantenimiento)
+        self.reparacion_label.setVisible(mostar_mantenimiento)
+        self.reparacion_input.setVisible(mostar_mantenimiento)
+        self.codigo_label.setVisible(not mostar_mantenimiento)
+        self.codigo_input.setVisible(not mostar_mantenimiento)
+        self.ambiente_label.setVisible(not mostar_mantenimiento)
+        self.ambiente_input.setVisible(not mostar_mantenimiento)
 
     def enviar_al_modulo(self):
         # Obtener todos los datos ingresados
@@ -204,14 +246,24 @@ class MainApplication(QMainWindow):
         codigo_destino = self.codigo_destino_input.text().upper()
         dependencia_destino = self.dependencia_destino_input.text().upper()
         ambiente_destino = self.ambiente_destino_input.text().upper()
+        ######caso de mantenimiento##########
+        solicitud = self.solicitud_input.text().upper()
+        diagnostico = self.diagnostico_input.text().upper()
+        conclusion = self.conclusion_input.text().upper()
+        ingreso = self.ingreso_input.text().upper()
+        reparacion =  self.reparacion_input.text().upper()
         
         # Obtener la tabla
         tabla = self.table
         generador = GenerarPDF()
         # Llamar a la función generar_reporte en el módulo generar_pdf
         # Configurar los datos en GenerarPDF
-        generador.set_datos(formato, numero, trabajador, codigo, dependencia, ambiente, trabajador_destino, codigo_destino, dependencia_destino, ambiente_destino,tabla)
-        generador.generar_reporte()
+        generador.set_datos(formato, numero, trabajador, codigo, dependencia, ambiente, trabajador_destino, codigo_destino, dependencia_destino, ambiente_destino,tabla, solicitud, diagnostico, conclusion, ingreso, reparacion)
+        print(formato)
+        if formato != "Salida por Mantenimiento":
+            generador.generar_reporte()
+        else:
+            generador.mantenimiento()
 
 
     def mostrar_modal(self):

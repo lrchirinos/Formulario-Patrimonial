@@ -1,12 +1,9 @@
 from reportlab.lib.pagesizes import letter
-from reportlab.lib import colors, styles
+from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle, Spacer,Image, PageTemplate, Frame
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import inch
 from reportlab.lib.units import cm
 from reportlab.lib.utils import ImageReader
-from reportlab.graphics.barcode import qr
-from reportlab.graphics import renderPDF
 
 import subprocess
 import os 
@@ -27,8 +24,12 @@ class GenerarPDF:
         self.dependencia_destino = ""
         self.ambiente_destino = ""
         self.tabla = None  # Aquí puedes inicializarlo con el valor apropiado
-
-    def set_datos(self, formato, numero, trabajador, codigo, dependencia, ambiente, trabajador_destino, codigo_destino, dependencia_destino, ambiente_destino, tabla):
+        self.solicitud = ""
+        self.diagnostico = ""
+        self.conclusion = ""
+        self.ingreso = ""
+        self.reparacion = ""
+    def set_datos(self, formato, numero, trabajador, codigo, dependencia, ambiente, trabajador_destino, codigo_destino, dependencia_destino, ambiente_destino, tabla, solicitud, diagnostico, conclusion, ingreso, reparacion):
         # Establece los atributos de la clase con los datos proporcionados
         self.formato = formato
         self.numero = numero
@@ -41,17 +42,18 @@ class GenerarPDF:
         self.dependencia_destino = dependencia_destino
         self.ambiente_destino = ambiente_destino
         self.tabla = tabla
+        self.solicitud = solicitud
+        self.diagnostico = diagnostico
+        self.conclusion = conclusion
+        self.ingreso = ingreso
+        self.reparacion = reparacion
 
     def enviar_datos(self):
-        formato = self.formato
+        
         trabajador = self.trabajador
-        codigo = self.codigo
         dependencia = self.dependencia
-        ambiente = self.ambiente
         trabajador_destino = self.trabajador_destino
-        codigo_destino = self.codigo_destino
         dependencia_destino = self.dependencia_destino
-        ambiente_destino = self.ambiente_destino
         tabla = self.tabla
         # Obtener el número de filas y columnas en la tabla
         num_filas = tabla.rowCount()
@@ -207,7 +209,6 @@ class GenerarPDF:
             
             # Aplicar un estilo a la tabla
             origen_tabla.setStyle(TableStyle([
-                #('BOTTOMPADDING', (0, 0), (-1, 0), 12),
                 ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
                 ('GRID', (0, 0), (-1, -1), 1, colors.black)
             ]))
@@ -236,13 +237,6 @@ class GenerarPDF:
             tabla_estilo.leading = 12
             tabla_estilo.fontSize = 8
             tabla_estilo.leftIndent = 8
-            #tabla_estilo.leading = 12
-            #tabla_estilo.fontSize = 8
-            #tabla_estilo.alignment = 1
-            # tabla_estilo.wordWrap = -2 
-            # tabla_estilo.topPadding = 0  # Padding superior para centrar verticalmente
-            # tabla_estilo.bottomPadding = 5  # Padding inferior para centrar verticalmente
-
 
             for row in range(num_filas):
                 fila = [str(id_autoincremental)]  # Convertir el ID a cadena y agregarlo a la fila
@@ -257,9 +251,6 @@ class GenerarPDF:
             # Crear un estilo para los campos de la tabla
             estilo_celda = getSampleStyleSheet()['Normal']
             estilo_celda.fontSize = 8
-            # estilo_celda.alignment = 1 
-            # estilo_celda.leading = 8
-            # estilo_celda.wordWrap = -2  # Espaciado entre líneas
             
             #creamos "Newtabla" la tabla donde ingresaremos los datos de la tabla
             Newtabla = Table(datos_tabla, colWidths=[0.5 * cm, 3.5 * cm, 2.5 * cm, 5 * cm, 3 * cm, 3.5 * cm, 0.5 * cm])
@@ -308,7 +299,10 @@ class GenerarPDF:
 
     #############################################################################################
     ##FIRMA DE CONFORMIDAD
-            firma_texto = "V. FIRMA DE CONFORMIDAD<b/>"
+            if formato in ["Desplazamiento", "Salida por Mantenimiento", "Acta de Devolución"]:
+                firma_texto = "V. FIRMA DE CONFORMIDAD<b/>"
+            else:
+                firma_texto = "IV. FIRMA DE CONFORMIDAD<b/>"
             firma_paragraph = Paragraph(firma_texto, estilo_negrita)
             contenido.append(firma_paragraph)
 
@@ -324,9 +318,6 @@ class GenerarPDF:
                 ('BOTTOMPADDING', (0, 0), (-1, 0), 50),
                 ('GRID', (0, 0), (-1, -1), 1, colors.black)
             ]))
-            # # Aplicar el estilo a las celdas de la tabla
-            # for i in range(len(datos_firma)):
-            #     firma_tabla.setStyle([('FONTSIZE', (0, i), (-1, i), estilo_contenido.fontSize)])
 
             contenido.append(firma_tabla)
             ################## Construir el PDF################################
@@ -340,3 +331,77 @@ class GenerarPDF:
                 subprocess.Popen(["start", pdf_file], shell=True)
             else:
                 print("El archivo PDF no se ha generado correctamente o no se encuentra en la ubicación esperada.")
+
+    def mantenimiento(self):
+        trabajador = self.trabajador
+        dependencia = self.dependencia
+        ingreso = self.ingreso
+        reparacion =  self.reparacion
+        solicitud = self.solicitud
+        conclusion = self.conclusion
+        tabla = self.tabla
+        contenido =[]
+        # Crear un archivo PDF
+        estilo_contenido = getSampleStyleSheet()['Normal']
+        estilo_contenido.fontSize = 8
+        ##########################ESTILOS############################################################
+        # Definir un estilo personalizado con negrita
+        estilo_negrita = ParagraphStyle('negrita')
+        estilo_negrita.fontName = 'Helvetica-Bold'
+        estilo_negrita.leading = 12
+        estilo_negrita.fontSize = 9
+        estilo_negrita.leftIndent = 8
+
+        negrita_center = ParagraphStyle('negrita')
+        negrita_center.fontName = 'Helvetica-Bold'
+        negrita_center.leading = 12
+        negrita_center.fontSize = 7
+        negrita_center.alignment = 1
+        negrita_center.wordWrap = -2 
+
+        estilo_firma = ParagraphStyle('firma')
+        estilo_firma.leading = 12
+        estilo_firma.fontSize = 7
+        estilo_firma.alignment = 1
+        estilo_firma.wordWrap = -2 
+#####################################################################################################
+        doc = SimpleDocTemplate("./reporte/reporte.pdf", pagesize=letter, leftMargin=30, rightMargin=30)
+        #doc.bottomMargin = 1
+        doc.topMargin = 30
+        # Ruta de la imagen que deseas utilizar en el encabezado
+        ruta_imagen = "./image/logo.png"
+
+        # Añadir imagen en la esquina izquierda del encabezado
+        imagen_encabezado = ruta_imagen
+        imagen = Image(imagen_encabezado,width=100, height=30)
+        imagen.hAlign = 'LEFT'
+        contenido.append(imagen)
+
+        
+        texto_encabezado = '"Año de la lucha contra la corrupción e impunidad"'
+        estilo_encabezado = ParagraphStyle('encabezado', fontSize=8, alignment=1, fontName='Helvetica-Oblique')
+        contenido.append(Paragraph(texto_encabezado, estilo_encabezado))
+
+        # Obtener dimensiones de la página
+        ancho_pagina, alto_pagina = letter
+        # Espacio en blanco
+        contenido.append(Spacer(1, 24))
+
+        texto_titulo = '<u>SERVICIO DE MANTENIMIENTO</u>'
+        estilo_titulo = ParagraphStyle('titulo', fontSize=11, alignment=1, spaceAfter=10, 
+                                       fontName='Helvetica-Bold')
+        contenido.append(Paragraph(texto_titulo, estilo_titulo))
+        
+        
+        doc.build(contenido)
+        
+        pdf_file = os.path.abspath("./reporte/reporte.pdf")
+
+        # Verificar si el archivo PDF existe
+        if os.path.exists(pdf_file):
+            # Abrir el archivo PDF en Windows
+            subprocess.Popen(["start", pdf_file], shell=True)
+        else:
+            print("El archivo PDF no se ha generado correctamente o no se encuentra en la ubicación esperada.")
+
+        
