@@ -10,6 +10,8 @@ import os
 import qrcode
 import tempfile
 from datetime import datetime
+
+
 class GenerarPDF:
     def __init__(self):
         # Inicializa los atributos de la clase con valores predeterminados
@@ -75,6 +77,7 @@ class GenerarPDF:
         # Agregar el código QR
         #datos = f"formato: {formato} \n Datos de origen: \n  \ttrabajador: {trabajador} \n \tdependencia: {dependencia} \n \tambiente: {ambiente} \n Datos del destino:\n \ttrabajador: {trabajador_destino} \n \tdependencia: {dependencia_destino} \n \tambiente: {ambiente_destino}"
         datos = f"trabajador origen: {trabajador} \n dependencia origen: {dependencia} \n trabajador destino: {trabajador_destino} \n dependencia destino: {dependencia_destino} \n dispositivos: {datos_tabla}"
+        print(datos_tabla)
         return datos
     def header(self,canvas, doc):
         # Agregar el logo
@@ -137,7 +140,56 @@ class GenerarPDF:
         numero_papeleta_paragraph.wrapOn(canvas, 200, 400)
         numero_papeleta_paragraph.drawOn(canvas, x_numero_papeleta, y_numero_papeleta)
 
+    def footer(self,canvas, doc):
+        # Agregar el logo
+        img_path = "./image/logo.png"
+        img = ImageReader(img_path)
+        canvas.drawImage(img, 40, 750, width=100, height=30, mask='auto')
 
+        texto_encabezado = '"Año de la lucha contra la corrupción e impunidad"'
+        estilo_encabezado = ParagraphStyle('encabezado', fontSize=8, alignment=1, fontName='Helvetica-Oblique')
+        estilo_encabezado =Paragraph(texto_encabezado, estilo_encabezado)
+        x_anio = 110  # Ajusta la coordenada X del título
+        y_anio = 720  # Ajusta la coordenada Y del título
+        estilo_encabezado.wrapOn(canvas, 400, 750)
+        estilo_encabezado.drawOn(canvas, x_anio, y_anio)
+
+        # Agregar el texto 1
+        estilo_primero = getSampleStyleSheet()['Normal']
+        estilo_primero.alignment = 1  # Alinea el texto al centro
+        estilo_primero.fontName = 'Helvetica-Bold'  # Cambia 'MiFuente' por el nombre de tu fuente personalizada
+        estilo_primero.fontSize = 8
+        primero_texto = "Jr. Independencia 543 - 547"
+        primero_paragraph = Paragraph(primero_texto, estilo_primero)
+        x_primero = 321  # Ajusta la coordenada X del título
+        y_primero = 40  # Ajusta la coordenada Y del título
+        primero_paragraph.wrapOn(canvas, 400, 40)
+        primero_paragraph.drawOn(canvas, x_primero, y_primero)
+
+        # Agregar el link
+        estilo_primero = getSampleStyleSheet()['Normal']
+        estilo_primero.alignment = 1  # Alinea el texto al centro
+        estilo_primero.fontName = 'Helvetica-Bold'  # Cambia 'MiFuente' por el nombre de tu fuente personalizada
+        estilo_primero.fontSize = 8
+        primero_texto = "www.essalud.gob.pe"
+        primero_paragraph = Paragraph(primero_texto, estilo_primero)
+        x_primero = 200  # Ajusta la coordenada X del título
+        y_primero = 25  # Ajusta la coordenada Y del título
+        primero_paragraph.wrapOn(canvas, 400, 20)
+        primero_paragraph.drawOn(canvas, x_primero, y_primero)
+
+        # Agregar el texto 2
+        estilo_segundo = getSampleStyleSheet()['Normal']
+        estilo_segundo.alignment = 0  # Alinea el texto al centro
+        estilo_segundo.fontName = 'Helvetica'  # Cambia 'MiFuente' por el nombre de tu fuente personalizada
+        estilo_segundo.fontSize = 8
+        estilo_segundo.leading = 8
+        segundo_texto = "Distrito Trujillo <br/> Trujillo-Perú <br/> T: 044-480806 Anexo 1238"
+        segundo_paragraph = Paragraph(segundo_texto, estilo_segundo)
+        x_segundo = 470  # Ajusta la coordenada X del título
+        y_segundo = 20 # Ajusta la coordenada Y del título
+        segundo_paragraph.wrapOn(canvas, 470, 20)
+        segundo_paragraph.drawOn(canvas, x_segundo, y_segundo)
     def generar_reporte(self):
             formato = self.formato
             trabajador = self.trabajador
@@ -332,12 +384,15 @@ class GenerarPDF:
             else:
                 print("El archivo PDF no se ha generado correctamente o no se encuentra en la ubicación esperada.")
 
+
     def mantenimiento(self):
         trabajador = self.trabajador
         dependencia = self.dependencia
+        nota = self.numero
         ingreso = self.ingreso
         reparacion =  self.reparacion
         solicitud = self.solicitud
+        diagnostico =  self.diagnostico
         conclusion = self.conclusion
         tabla = self.tabla
         contenido =[]
@@ -348,42 +403,20 @@ class GenerarPDF:
         # Definir un estilo personalizado con negrita
         estilo_negrita = ParagraphStyle('negrita')
         estilo_negrita.fontName = 'Helvetica-Bold'
-        estilo_negrita.leading = 12
-        estilo_negrita.fontSize = 9
-        estilo_negrita.leftIndent = 8
+        estilo_negrita.fontSize = 7
 
-        negrita_center = ParagraphStyle('negrita')
-        negrita_center.fontName = 'Helvetica-Bold'
-        negrita_center.leading = 12
-        negrita_center.fontSize = 7
-        negrita_center.alignment = 1
-        negrita_center.wordWrap = -2 
-
-        estilo_firma = ParagraphStyle('firma')
-        estilo_firma.leading = 12
-        estilo_firma.fontSize = 7
-        estilo_firma.alignment = 1
-        estilo_firma.wordWrap = -2 
+        estilo_letra = ParagraphStyle('normal')
+        estilo_letra.fontSize = 7
+        # estilo_letra.leading = 12
+        # estilo_letra.alignment = 1
+        # estilo_letra.wordWrap = -2 
 #####################################################################################################
-        doc = SimpleDocTemplate("./reporte/reporte.pdf", pagesize=letter, leftMargin=30, rightMargin=30)
+        
+##################################################################################
+        doc = SimpleDocTemplate("./reporte/reporte.pdf", pagesize=letter, leftMargin=40, rightMargin=30)
         #doc.bottomMargin = 1
         doc.topMargin = 30
-        # Ruta de la imagen que deseas utilizar en el encabezado
-        ruta_imagen = "./image/logo.png"
 
-        # Añadir imagen en la esquina izquierda del encabezado
-        imagen_encabezado = ruta_imagen
-        imagen = Image(imagen_encabezado,width=100, height=30)
-        imagen.hAlign = 'LEFT'
-        contenido.append(imagen)
-
-        
-        texto_encabezado = '"Año de la lucha contra la corrupción e impunidad"'
-        estilo_encabezado = ParagraphStyle('encabezado', fontSize=8, alignment=1, fontName='Helvetica-Oblique')
-        contenido.append(Paragraph(texto_encabezado, estilo_encabezado))
-
-        # Obtener dimensiones de la página
-        ancho_pagina, alto_pagina = letter
         # Espacio en blanco
         contenido.append(Spacer(1, 24))
 
@@ -391,8 +424,114 @@ class GenerarPDF:
         estilo_titulo = ParagraphStyle('titulo', fontSize=11, alignment=1, spaceAfter=10, 
                                        fontName='Helvetica-Bold')
         contenido.append(Paragraph(texto_titulo, estilo_titulo))
+        contenido.append(Spacer(1, 24))
+
+        # Tabla para Datos
+        info = [[Paragraph("DEPENDENCIA", estilo_negrita), Paragraph(": {}".format(dependencia), estilo_letra), Paragraph("HOJA DE SERVICIO",estilo_negrita), Paragraph(": {}".format(nota), estilo_letra)],
+                        [Paragraph("RESPONSABLE",estilo_negrita), Paragraph(": {}".format(trabajador), estilo_letra), Paragraph("N° DE INFORME TECNICO",estilo_negrita), Paragraph(": {}".format(nota), estilo_letra)],
+                        ["", "", Paragraph("FECHA DE INGRESO",estilo_negrita), Paragraph(": {}".format(ingreso), estilo_letra)],
+                        ["", "", Paragraph("FECHA DE REPARACIÓN",estilo_negrita), Paragraph(": {}".format(reparacion), estilo_letra)]]
+
+        datos = Table(info, colWidths=[2.4 * cm, 11 * cm, 3.5 * cm, 2 * cm])
+
+        # Aplicar un estilo a la tabla
+        datos.setStyle(TableStyle([
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 0.3)
+            #('GRID', (0, 0), (-1, -1), 1, colors.black)
+        ]))
+
+        contenido.append(datos)
+        contenido.append(Spacer(1, 24))
+        ###############################tabla dispositivos########################
+        #datos_tabla son los datos que obtendra de la "tabla" creada en el index
+        datos_tabla = [["CÓDIGO PATRIMONIAL", "EQUIPO", "SERIE", "MARCA", "MODELO"]]
+
+        num_filas = tabla.rowCount()
+
+        tabla_estilo = ParagraphStyle('tabla')
+        tabla_estilo.leading = 12
+        tabla_estilo.fontSize = 8
+        tabla_estilo.leftIndent = 8
+
+        for row in range(num_filas):
+            fila = []  # Convertir el ID a cadena y agregarlo a la fila
+            for col in range(tabla.columnCount()):
+                item = tabla.item(row, col)
+                if item is not None:
+                    fila.append(item.text())
+                else:
+                    fila.append("")
+            fila=fila[:-1]
+            datos_tabla.append(fila)
+            
+        # Crear un estilo para los campos de la tabla
+        estilo_celda = getSampleStyleSheet()['Normal']
+        estilo_celda.fontSize = 8
         
+        #creamos "Newtabla" la tabla donde ingresaremos los datos de la tabla
+        Newtabla = Table(datos_tabla, colWidths=[3.5 * cm, 3 * cm, 5 * cm, 3 * cm, 4 * cm])
+        Newtabla.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black)
+        ]))
+        # Aplicar el estilo a las celdas de la tabla
+        for i in range(len(datos_tabla)):
+            Newtabla.setStyle([('FONTSIZE', (0, i), (-1, i), estilo_celda.fontSize)])
+
+        contenido.append(Newtabla)
+        contenido.append(Spacer(1, 24))
+
+        #########################################################################
+        #informes
+        solicitud_texto = "INFORME DE SOLICITUD<b/>"
+        contenido.append(Paragraph(solicitud_texto, estilo_negrita))
+        contenido.append(Paragraph("{}".format(solicitud), estilo_letra))
+        contenido.append(Spacer(1, 12))
+
+        diagnostico_texto = "INFORME DE DIAGNÓSTICO<b/>"
+        contenido.append(Paragraph(diagnostico_texto, estilo_negrita))
+        contenido.append(Paragraph("{}".format(diagnostico), estilo_letra))
+        contenido.append(Spacer(1, 12))
+
+        conclusion_texto = "INFORME DE CONCLUSION<b/>"
+        contenido.append(Paragraph(conclusion_texto, estilo_negrita))
+        contenido.append(Paragraph("{}".format(conclusion), estilo_letra))
+
+        ######################firma final
+
+        datos_firma=[
+                ["", "", ""],
+                ["V°B DE LA JEFATURA", "V°B TÉCNICO DE LA OF. DE OSI","RECIBI CONFORME\nDNI:_________\n      NOMBRE:_________________"]
+            ]
+        firma_tabla = Table(datos_firma, colWidths=[6.5 * cm, 7 * cm, 5 * cm])
         
+        # Aplicar un estilo a la tabla
+        firma_tabla.setStyle(TableStyle([
+            #('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 100),
+            #('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold')
+        ]))
+
+        contenido.append(firma_tabla)
+
+        ##################encabezado
+
+        footer_frame = Frame(doc.leftMargin, doc.bottomMargin + 20, doc.width, doc.height - 20)
+
+        footer_template = PageTemplate(id='footer', frames=[footer_frame], onPage=self.footer)
+
+        # Agregar la plantilla de página al documento
+        doc.addPageTemplates([footer_template])
+
+
+        #############contruccion del pdf
         doc.build(contenido)
         
         pdf_file = os.path.abspath("./reporte/reporte.pdf")
