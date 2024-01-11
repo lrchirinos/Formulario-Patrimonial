@@ -252,7 +252,7 @@ class MainApplication(QMainWindow):
         conclusion = self.conclusion_input.text().upper()
         ingreso = self.ingreso_input.text().upper()
         reparacion =  self.reparacion_input.text().upper()
-        
+         
         # Obtener la tabla
         tabla = self.table
         generador = GenerarPDF()

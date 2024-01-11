@@ -383,7 +383,7 @@ class GenerarPDF:
                 subprocess.Popen(["start", pdf_file], shell=True)
             else:
                 print("El archivo PDF no se ha generado correctamente o no se encuentra en la ubicación esperada.")
-
+ 
 
     def mantenimiento(self):
         trabajador = self.trabajador
